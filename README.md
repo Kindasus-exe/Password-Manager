@@ -37,4 +37,4 @@ Il programma calcola l’hash
 Lo confronta con quello salvato
 Dopo 3 tentativi falliti → uscita
 
-_ ⚠️  master.key e passwords.json sono esclusi dalla repository tramite .gitignore. _
+''' ⚠️  master.key e passwords.json sono esclusi dalla repository tramite .gitignore. '''
