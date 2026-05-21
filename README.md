@@ -1,5 +1,11 @@
 # 🔐 Password Manager – Python
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20Mac-lightgrey)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)
+
 
 ## ✨ Funzionalità principali
 - 🔑 Master Password con hash SHA256
