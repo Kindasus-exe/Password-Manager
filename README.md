@@ -13,7 +13,8 @@
 
 
 ## 🔐 Come funziona la Master Password
-#Primo avvio
+
+# Primo avvio
 Il programma chiede di creare una master password
 
 Genera un salt casuale
@@ -28,23 +29,3 @@ Il programma calcola l’hash
 Lo confronta con quello salvato
 Dopo 3 tentativi falliti → uscita
 *⚠️ master.key e passwords.json sono esclusi dalla repository tramite .gitignore.*
-
-
-# Titolo grande
-## Titolo medio
-### Titolo piccolo
-
-**testo in grassetto**
-*testo in corsivo*
-
-- elemento lista
-- altro elemento
-
-1. passo uno
-2. passo due
-
-`codice inline`
-
-```java
-// blocco di codice
-```
