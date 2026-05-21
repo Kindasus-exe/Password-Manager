@@ -1,7 +1,7 @@
-🔐 Password Manager – Python
+#🔐 Password Manager – Python
 
 
-✨ Funzionalità principali
+##✨ Funzionalità principali
 - 🔑 Master Password con hash SHA256
 - 🧂 Salt randomico per maggiore sicurezza
 - 🗝️ File master.key generato automaticamente
@@ -12,8 +12,8 @@
 
 
 
-🔐 Come funziona la Master Password
-Primo avvio
+##🔐 Come funziona la Master Password
+#Primo avvio
 Il programma chiede di creare una master password
 
 Genera un salt casuale
@@ -22,13 +22,29 @@ Calcola l’hash SHA256 della password
 
 Salva password_hash e salt in master.key
 
-Avvii successivi
+#Avvii successivi
 L’utente inserisce la master password
-
 Il programma calcola l’hash
-
 Lo confronta con quello salvato
-
 Dopo 3 tentativi falliti → uscita
+*⚠️ master.key e passwords.json sono esclusi dalla repository tramite .gitignore.*
 
-⚠️ master.key e passwords.json sono esclusi dalla repository tramite .gitignore.
+
+# Titolo grande
+## Titolo medio
+### Titolo piccolo
+
+**testo in grassetto**
+*testo in corsivo*
+
+- elemento lista
+- altro elemento
+
+1. passo uno
+2. passo due
+
+`codice inline`
+
+```java
+// blocco di codice
+```
