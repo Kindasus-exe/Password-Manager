@@ -5,6 +5,8 @@
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20Mac-lightgrey)
 ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen)
+![Last Commit](https://img.shields.io/github/last-commit/Kindasus-exe/Password-Manager)
+
 
 
 ## ✨ Funzionalità principali
