@@ -1,3 +1,4 @@
 master.key
+passwords.json
 __pycache__/
 *.pyc

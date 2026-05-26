@@ -16,59 +16,22 @@ init(autoreset=True)
 
 #Master password functions
 
-def check_master_password():
-    # Se il file non esiste primo avvio
+def check_master_password(password=None):
     if not os.path.exists(MASTER_KEY_FILE):
-        print(Fore.YELLOW + "Nessuna master password trovata. Creane una ora.")
-        master_password = input(Fore.WHITE + "Crea una password master: ")
-
-        # 1. genera salt (bytes)
+        # primo avvio - password è quella che l'utente ha inserito nella GUI
         salt = os.urandom(16)
-
-        # 2. calcola hash SHA256
-        password_hash = hashlib.sha256(master_password.encode()).hexdigest()
-
-        # 3. converti salt in base64
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
         salt_b64 = base64.b64encode(salt).decode()
-
-        # 4. salva tutto nel file
-        data = {
-            "password_hash": password_hash,
-            "salt": salt_b64
-        }
-
+        data = {"password_hash": password_hash, "salt": salt_b64}
         with open(MASTER_KEY_FILE, "w") as f:
             json.dump(data, f)
-
-        print(Fore.GREEN + "Master password creata con successo.")
-        return master_password, salt
-
-    # Se il file esiste verifica password
+        return True
     else:
+        # verifica
         with open(MASTER_KEY_FILE, "r") as f:
             data = json.load(f)
-
-        saved_hash = data["password_hash"]
-        salt_b64 = data["salt"]
-
-        # ricostruisci il salt
-        salt = base64.b64decode(salt_b64)
-
-        for _ in range(3):
-            master_password = input(Fore.WHITE + "Inserisci la password master: ")
-
-            # calcola hash della password inserita
-            password_hash = hashlib.sha256(master_password.encode()).hexdigest()
-
-            if password_hash == saved_hash:
-                print(Fore.GREEN + "Accesso consentito.")
-                return master_password, salt
-
-            print(Fore.RED + "Password errata.")
-
-        print(Fore.RED + "Accesso negato.")
-        exit()
-
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        return password_hash == data["password_hash"]
 
 
 # Main functions
@@ -92,33 +55,16 @@ def save_passwords(passwords):
         json.dump(passwords, file, indent=4)
         
 
-def add_password():
-    website = format_website_name(input(Fore.WHITE + "Inserisci il nome del sito web: "))
-    username= input("Inserisci il nome utente: ")
-    password = input("Inserisci la password: ")
+def add_password(website, username, password):
+    website = format_website_name(website)
     
-    
-    if website in load_passwords():
-        print(Fore.YELLOW + "Sito web già presente. Vuoi sovrascrivere la password? (s/n)")
-        scelta = input().lower()
-        if scelta != 's':
-            print(Fore.RED + "Operazione annullata.")
-            return
-
     passwords = load_passwords()
-    
     passwords[website] = {
         "username": username,
         "password": password
     }
-
     save_passwords(passwords)
     print(Fore.GREEN + "Password salvata con successo.")
-    print(f"Sito web: {website}")
-    print(f"Nome utente: {username}")
-    print(f"Password: {password}")
-    
-    
     
     
 def view_passwords():
@@ -151,45 +97,43 @@ def search_password():
     else:
         print(Fore.RED + "Sito web non trovato.")
 
-def edit_password():
-    website = format_website_name(input(Fore.WHITE + "Inserisci il nome del sito web da modificare: "))
+def edit_password(website, new_username, new_password):
+    website = format_website_name(website)
     passwords = load_passwords()
 
     if website in passwords:
-        print(f"Sito web: {website}")
-        print(f"Nome utente: {passwords[website]['username']}")
-        print(f"Password: {passwords[website]['password']}")
-
-        new_username = input("Inserisci il nuovo nome utente (lascia vuoto per non modificare): ")
-        new_password = input("Inserisci la nuova password (lascia vuoto per non modificare): ")
-
         if new_username:
             passwords[website]['username'] = new_username
         if new_password:
             passwords[website]['password'] = new_password
 
         save_passwords(passwords)
-        print(Fore.GREEN + "Password aggiornata con successo.")
+        return True
+    else:
+        return False
+    
+
+def delete_password(website):
+    website = format_website_name(website)
+    passwords = load_passwords()
+
+    if website in passwords:
+        del passwords[website]
+        save_passwords(passwords)
     else:
         print(Fore.RED + "Sito web non trovato.")
         
 
-def delete_password():
-    website = format_website_name(input(Fore.WHITE + "Inserisci il nome del sito web da eliminare: "))
-    passwords = load_passwords()
-    if website in passwords:
-        del passwords[website]
-        save_passwords(passwords)
-        print(Fore.GREEN + f"Password eliminata con successo per il sito {website}.")
-        
-
-
-def generate_password():
+def generate_password(length=None):
     import random
     import string
     
     try:
-        lunghezza_psw = int(input(Fore.WHITE + "Inserisci la lunghezza della password: "))
+        if length is None:
+            lunghezza_psw = int(input(Fore.WHITE + "Inserisci la lunghezza della password: "))
+        else:
+            lunghezza_psw = length
+
     except ValueError:
         print(Fore.RED + "Input non valido. Inserisci un numero. O.o")
         return
@@ -205,6 +149,7 @@ def generate_password():
     characters = string.ascii_letters + string.digits + string.punctuation
     password = ''.join(random.choice(characters) for n in range(lunghezza_psw))
     print(Fore.MAGENTA + f"Password generata: " + Fore.WHITE + f"{password}") 
+    return password
 
 # UTILITY FUNCTIONS
 
@@ -215,43 +160,52 @@ def format_website_name(website):
 
 
 # MENU PRINCIPALE
+if __name__ == "__main__":
+    password = input(Fore.WHITE + "Inserisci la master password: ")
+    if not check_master_password(password):
+        print(Fore.RED + "Master password errata. Uscita dal programma.")
+        exit()
+    load_passwords()  # Carica le password all'avvio del programma
 
-master_password, salt = check_master_password()  # Verifica o crea la master password
-load_passwords()  # Carica le password all'avvio del programma
-
-while True:
-    print (f"{Fore.CYAN}\n------ Password Manager ------")
-    print(Fore.LIGHTBLUE_EX + "1. Aggiungi password")
-    print(Fore.LIGHTBLUE_EX + "2. Visualizza password")
-    print(Fore.LIGHTBLUE_EX + "3. Cerca password")
-    print(Fore.LIGHTBLUE_EX + "4. Modifica password")
-    print(Fore.LIGHTBLUE_EX + "5. Elimina password")
-    print(Fore.LIGHTBLUE_EX + "6. Genera password sicura")
-    print(Fore.LIGHTBLUE_EX + "7. Esci")
+    while True:
+        print (f"{Fore.CYAN}\n------ Password Manager ------")
+        print(Fore.LIGHTBLUE_EX + "1. Aggiungi password")
+        print(Fore.LIGHTBLUE_EX + "2. Visualizza password")
+        print(Fore.LIGHTBLUE_EX + "3. Cerca password")
+        print(Fore.LIGHTBLUE_EX + "4. Modifica password")
+        print(Fore.LIGHTBLUE_EX + "5. Elimina password")
+        print(Fore.LIGHTBLUE_EX + "6. Genera password sicura")
+        print(Fore.LIGHTBLUE_EX + "7. Esci")
+        scelta = input(Fore.MAGENTA + "Scegli un'opzione: ")
+        if scelta == "1":
+            website = input(Fore.WHITE + "Inserisci il nome del sito web: ")
+            username = input(Fore.WHITE + "Inserisci il nome utente: ")
+            password = input(Fore.WHITE + "Inserisci la password: ")
+            add_password(website, username, password)
+        
+        elif scelta == "2":
+            view_passwords()
+        
+        elif scelta == "3":
+            search_password()
+        
+        elif scelta == "4":
+            website = input(Fore.WHITE + "Inserisci il nome del sito web da modificare: ")
+            new_username = input(Fore.WHITE + "Inserisci il nuovo nome utente (lascia vuoto per non modificare): ")
+            new_password = input(Fore.WHITE + "Inserisci la nuova password (lascia vuoto per non modificare): ")
+            edit_password(website, new_username, new_password)
+        
+        elif scelta == "5":
+            website = input(Fore.WHITE + "Inserisci il nome del sito web da eliminare: ")
+            delete_password(website)
+        
+        elif scelta == "6":
+            lunghezza_psw = int(input(Fore.WHITE + "Inserisci la lunghezza della password: "))  
+            generate_password(length=lunghezza_psw)
+        
+        elif scelta == "7":
+            print(Fore.YELLOW + "Uscita dal Password Manager. Arrivederci!")
+            break
     
-    scelta = input(Fore.MAGENTA + "Scegli un'opzione: ")
-    
-    if scelta == "1":
-        add_password()
-        
-    elif scelta == "2":
-        view_passwords()
-        
-    elif scelta == "3":
-        search_password()
-        
-    elif scelta == "4":
-        edit_password()
-        
-    elif scelta == "5":
-        delete_password()
-        
-    elif scelta == "6":
-        generate_password()
-        
-    elif scelta == "7":
-        print(Fore.YELLOW + "Uscita dal Password Manager. Arrivederci!")
-        break
-    
-    else:
-        print(Fore.RED + "Opzione non valida. Riprova.")
+        else:
+            print(Fore.RED + "Opzione non valida. Riprova.")
