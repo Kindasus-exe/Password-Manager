@@ -56,8 +56,8 @@ Avvia main.py per usare la versione da terminale:
 
 ## Dipendenze
 
-'''
-customtkinter
-colorama
-pillow
-'''
+```
+- customtkinter
+- colorama
+- pillow
+```
